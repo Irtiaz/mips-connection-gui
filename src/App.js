@@ -1,23 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import { getConnectionsFrom, getGraphFromConnectionString } from './util/graph';
+import { useState } from 'react';
+
+const graph = getGraphFromConnectionString();
+console.log(graph);
+console.log(getConnectionsFrom(graph, 'ADDER_0', '7'));
 
 function App() {
+  const [currentComponent, setCurrentComponent] = useState(
+    Object.keys(graph)[0]
+  );
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <select
+        value={currentComponent}
+        onChange={(e) => setCurrentComponent(e.target.value)}
+      >
+        {Object.keys(graph).map((component) => (
+          <option key={component}>{component}</option>
+        ))}
+      </select>
+
+      <ul>
+        {Object.keys(graph[currentComponent]).map((pin) => (
+          <li key={`${currentComponent} ${pin}`}>
+            <div>pin {pin}</div>
+            <div>
+              <ul>
+                {getConnectionsFrom(graph, currentComponent, pin).map(
+                  (connection) => (
+                    <li
+                      key={`${currentComponent} ${pin} ${connection.component} ${connection.pin}`}
+                    >
+                      {connection.component} pin {connection.pin}
+                    </li>
+                  )
+                )}
+              </ul>
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
